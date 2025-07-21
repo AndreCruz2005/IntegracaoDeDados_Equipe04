@@ -1,3 +1,5 @@
+#botei esse pq to com as tableas axtraidas tudo aq no meu local nao sei quantos anos vamos usar ao certo
+*.csv
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
