@@ -24,7 +24,11 @@ Repositório para projeto de Integração de Dados - Banco de Dados CIn/UFPE 202
 2. Crie e configure o arquivo `.env` (veja `.env.example` para referência):
 
     ```
-    DATABASE_URL="postgresql+psycopg2://usuario:senha@localhost:5432/nome_do_banco"
+    DATABASE_USER="user"
+    DATABASE_PASSWORD="pass"
+    DATABASE_HOST="localhost"
+    DATABASE_PORT="5432"
+    DATABASE_NAME="postgres"
     ```
 
 3. Instale as dependências:
