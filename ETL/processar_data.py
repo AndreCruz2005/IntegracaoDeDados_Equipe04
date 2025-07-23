@@ -1,12 +1,14 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-from postgres.postgres import engine
 from sqlalchemy import text
-import requests
-from io import StringIO
-
 
 def padronizar_colunas(table: pd.DataFrame):
+    """
+    Função para padrozinar colunas 
+    Colunas relacionadas a anos e meses devem ser int
+    Colunas relacionadas a dinheiro devem ser float
+    Demais colunas devem ser string
+    """
     colunas_int = ('empenho_ano', 'ano_movimentacao', 'mes_movimentacao')
     colunas_float = ('valor_empenhado', 'valor_liquidado', 'valor_pago')
     
@@ -23,25 +25,52 @@ def padronizar_colunas(table: pd.DataFrame):
         else:
             table[coluna] =  table[coluna].astype(str)
 
+
 def insert_unique(table: pd.DataFrame, engine, table_name: str, columns: list):
+    """
+    Função para inserir dimensões no banco de dados
+    """
     unique = table[columns].drop_duplicates()
     unique.to_sql(table_name, engine, if_exists='append', index=False, method='multi')
 
+
 def insert_empenho(table: pd.DataFrame, engine):
+    """
+    Função para inserir o fato principal (Empenhos) no banco de dados
+    """
     empenho_cols = [
-        "empenho_ano", "empenho_numero", "subempenho", "indicador_subempenho",
-        "valor_empenhado", "valor_liquidado", "valor_pago",
-        "ano_movimentacao", "mes_movimentacao",
-        "empenho_modalidade_codigo", "unidade_codigo", "categoria_economica_codigo",
-        "grupo_despesa_codigo", "modalidade_aplicacao_codigo", "subelemento_codigo",
-        "subfuncao_codigo", "acao_codigo", "fonte_recurso_codigo", "credor_codigo", "modalidade_licitacao_codigo"
+        "empenho_ano", 
+        "empenho_numero", 
+        "subempenho", 
+        "indicador_subempenho",
+        "valor_empenhado", 
+        "valor_liquidado", 
+        "valor_pago",
+        "ano_movimentacao", 
+        "mes_movimentacao",
+        "empenho_modalidade_codigo", 
+        "unidade_codigo", 
+        "categoria_economica_codigo",
+        "grupo_despesa_codigo", 
+        "modalidade_aplicacao_codigo", 
+        "subelemento_codigo",
+        "subfuncao_codigo", 
+        "acao_codigo", 
+        "fonte_recurso_codigo", 
+        "credor_codigo", 
+        "modalidade_licitacao_codigo"
     ]
     table[empenho_cols].to_sql(
-        "Empenho", engine, if_exists='append', index=False, method='multi', chunksize=1000
+        "Empenho",
+        engine,
+        if_exists="append",
+        index=False,
+        method='multi'
     )
 
+
 def store_1_table(table: pd.DataFrame):
-    from postgres.postgres import engine  # assumes your engine is defined here
+    from postgres.postgres import engine 
 
     padronizar_colunas(table)
 
@@ -60,16 +89,14 @@ def store_1_table(table: pd.DataFrame):
     insert_unique(table, engine, "ModalidadeEmpenho", ["empenho_modalidade_codigo", "empenho_modalidade_nome"])
     insert_unique(table, engine, "ModalidadeLicitacao", ["modalidade_licitacao_codigo", "modalidade_licitacao_nome"])
     insert_unique(table, engine, "Credor", ["credor_codigo", "credor_nome"])
-
     insert_empenho(table, engine)
 
             
 def main():
-    res = requests.get('https://media.githubusercontent.com/media/AndreCruz2005/IntegracaoDeDados_Equipe04/refs/heads/andre_dev/data/recife-dados-despesas-2023.csv')
-    csv_data = StringIO(res.content.decode('utf-8'))
-    test_table = pd.read_csv(csv_data, sep=';')
-    store_1_table(test_table)
-    
+    for y in range(2003, 2021): # De 2003 a 2020
+        test_table = pd.read_csv(f'data/recife-dados-despesas-{y}.csv', sep=';')
+        print("Processando dados do ano", y)
+        store_1_table(test_table)    
     
 if __name__ == "__main__":
     main()

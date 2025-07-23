@@ -2,10 +2,6 @@
 
 Respositório para projeto de Integração de Dados - Banco de Dados CIn/UFPE 2025.1
 
-# IntegracaoDeDados_Equipe04
-
-Repositório para projeto de Integração de Dados - Banco de Dados CIn/UFPE 2025.1
-
 ## Pré-requisitos
 
 -   Python 3.10 ou superior
@@ -38,26 +34,18 @@ Repositório para projeto de Integração de Dados - Banco de Dados CIn/UFPE 202
 
 ## Execução
 
-Para rodar a análise e gerar gráficos:
+Para criar as entidades no banco de dados PostgreSQL
 
 ```sh
-python main.py
+python ETL/postgres/criar_tabelas.py
 ```
 
-Para testar a conexão com o banco de dados PostgreSQL:
+Para extrair dados das tabelas CSV, transformar-los e fazer o upload destes para o banco de dados
 
 ```sh
-python postgres.py
+python ETL/processar_data.py
 ```
-
-## Estrutura
-
--   `ETL/main.py`: Código principal de análise e geração de gráficos.
--   `ETL/postgres.py`: Teste de conexão com o banco de dados.
--   `data/`: Arquivos CSV de despesas por ano.
--   `test_output.csv`: Saída de exemplo da análise.
 
 ## Observações
 
--   Certifique-se de que o banco de dados está acessível conforme configurado em `.env`.
--   Os gráficos serão exibidos na tela ao executar o `main.py`.
+- Certifique-se de que o banco de dados está acessível conforme configurado em `.env`.
