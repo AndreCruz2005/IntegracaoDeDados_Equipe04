@@ -1,12 +1,9 @@
-from sqlalchemy import create_engine, text
+from sqlalchemy import text
+from postgres import engine
 from dotenv import load_dotenv
 import os
 
 load_dotenv()
-
-# Formato:
-DATABASE_URL = f"postgresql+psycopg2://{os.getenv('DATABASE_USER')}:{os.getenv('DATABASE_PASSWORD')}@{os.getenv('DATABASE_HOST')}:{os.getenv('DATABASE_PORT')}/{os.getenv('DATABASE_NAME')}"
-engine = create_engine(DATABASE_URL)
 
 # Conectar ao banco de dados e deletar todas as tabelas previamente criadas
 # Depois, criar todas as tabelas necessárias
@@ -137,12 +134,16 @@ with engine.connect() as connection:
     connection.execute(text(f"""
     CREATE TABLE Empenho (
         empenho_ano INTEGER,
-        empenho_modalidade_codigo VARCHAR,
         empenho_numero VARCHAR,
         subempenho VARCHAR,
         indicador_subempenho VARCHAR,
+        valor_empenhado NUMERIC,
+        valor_liquidado NUMERIC,
+        valor_pago NUMERIC,
         ano_movimentacao INTEGER,
         mes_movimentacao INTEGER,
+        
+        empenho_modalidade_codigo VARCHAR,
         unidade_codigo VARCHAR,
         categoria_economica_codigo VARCHAR,
         grupo_despesa_codigo VARCHAR,
@@ -153,10 +154,9 @@ with engine.connect() as connection:
         fonte_recurso_codigo VARCHAR,
         credor_codigo VARCHAR,
         modalidade_licitacao_codigo VARCHAR,
-        valor_empenhado NUMERIC,
-        valor_liquidado NUMERIC,
-        valor_pago NUMERIC,
+
         PRIMARY KEY (empenho_ano, empenho_modalidade_codigo, empenho_numero, subempenho),
+        
         FOREIGN KEY (empenho_modalidade_codigo) REFERENCES ModalidadeEmpenho(empenho_modalidade_codigo),
         FOREIGN KEY (unidade_codigo) REFERENCES Unidade(unidade_codigo),
         FOREIGN KEY (categoria_economica_codigo) REFERENCES CategoriaEconomica(categoria_economica_codigo),
