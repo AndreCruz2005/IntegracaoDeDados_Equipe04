@@ -1,3 +1,7 @@
+# não enviar minhas informações confidenciais para o repositório
+.env
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
