@@ -20,4 +20,3 @@ for arquivo in arquivos_csv:
 df_total = pd.concat(dfs, ignore_index = True)
 
 
-
