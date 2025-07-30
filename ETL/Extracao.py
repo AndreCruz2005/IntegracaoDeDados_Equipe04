@@ -13,7 +13,7 @@ dfs = []
 for arquivo in arquivos_csv:
     caminho_arquivo = os.path.join(diretorio, arquivo)
     # Lendo o CSV e armazenando em df
-    df = pd.read_csv(caminho_arquivo, sep = ';', header = None, encoding = 'utf-8')
+    df = pd.read_csv(caminho_arquivo, sep = ';', header = None, encoding = 'utf-8', low_memory=False)
     dfs.append(df)
 
 # Concatenando todos os Dataframes em um só
