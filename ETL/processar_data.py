@@ -93,10 +93,13 @@ def store_1_table(table: pd.DataFrame):
 
             
 def main():
-    for y in range(2003, 2021): # De 2003 a 2020
+    joined = pd.DataFrame()
+    for y in range(2003, 2021):
         test_table = pd.read_csv(f'data/recife-dados-despesas-{y}.csv', sep=';')
         print("Processando dados do ano", y)
-        store_1_table(test_table)    
+        joined = pd.concat([joined, test_table], ignore_index=True)
+
+    store_1_table(joined)  
     
 if __name__ == "__main__":
     main()
