@@ -1,3 +1,7 @@
+# para não enviar essa pasta "pesada" e conseguir dar push
+data/
+despesas_recife.csv
+
 # não enviar minhas informações confidenciais para o repositório
 .env
 
