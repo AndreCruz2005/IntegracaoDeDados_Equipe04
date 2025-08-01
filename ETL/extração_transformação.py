@@ -8,17 +8,16 @@ from sqlalchemy.dialects.postgresql import NUMERIC  #tive que colocar para numer
 # Caminho dos arquivos
 pasta = Path(r"C:\Users\joaov\OneDrive\Documentos\cin\repositorio\ProjetoIntegracao\IntegracaoDeDados_Equipe04\data")
 
-COL_INT = ('empenho_ano', 'ano_movimentacao', 'mes_movimentacao')
-COL_NUMERIC = ('valor_empenhado', 'valor_liquidado', 'valor_pago')  # agora serão NUMERIC
+COL_INT = ('empenho_ano', 'ano_movimentacao', 'mes_movimentacao', 'orgao_codigo', 'grupo_despesas_codigo','modalidade_aplicacao_codigo','elemento_codigo','subelemento_codigo','funcao_codigo','subfuncao_codigo','programa_codigo','acao_codigo','fonte_recurso_codigo','empenho_numero','subempenho', 'credor_codigo','modalidade_licitacao_codigo')
+COL_NUMERIC = ('valor_empenhado', 'valor_liquidado', 'valor_pago')
+
+
 
 def padronizar_colunas(df: pd.DataFrame) -> pd.DataFrame:
-    for col in COL_INT + COL_NUMERIC:
-        if col not in df.columns:
-            df[col] = pd.NA
 
     # INT (nullable)
     for col in COL_INT:
-        df[col] = pd.to_numeric(df[col], errors='coerce').astype('Int64')
+        df[col] = df[col].astype(int)
 
     # NUMERIC (trata como float no pandas, mas envia como NUMERIC)
     for col in COL_NUMERIC:
@@ -29,7 +28,7 @@ def padronizar_colunas(df: pd.DataFrame) -> pd.DataFrame:
             .str.replace(',', '.', regex=False)  # vírgula vira ponto
             .str.replace(r'[^\d\.-]', '', regex=True)  # tira símbolos
         )
-        df[col] = pd.to_numeric(df[col], errors='coerce').astype(float).round(2)  # arredonda em 2 casas
+        df[col] = pd.to_numeric(df[col], errors='raise').astype(float).round(2)  # arredonda em 2 casas, errors = raise o pandas me avisa se tiver erro
 
     outras = [c for c in df.columns if c not in COL_INT + COL_NUMERIC]
     df[outras] = df[outras].astype(str)
@@ -38,24 +37,21 @@ def padronizar_colunas(df: pd.DataFrame) -> pd.DataFrame:
 
 def ler_e_concatenar(pasta: Path) -> pd.DataFrame:
     arquivos = sorted(pasta.glob("recife-dados-despesas-*.csv"))
-    if not arquivos:
-        raise FileNotFoundError("Nenhum arquivo encontrado com o padrão 'recife-dados-despesas-*.csv'.")
 
     dfs = []
     for arq in arquivos:
-        m = re.search(r"(\d{4})", arq.stem)
-        ano = m.group(1) if m else None
-
+        
+        nome = arq.stem  # Ex: 'recife-dados-despesas-2023'
+        ano = int(nome[-4:])  # Últimos 4 caracteres => o ano
+        
         df = pd.read_csv(arq, sep=';', encoding='latin1', dtype=str)
         df = padronizar_colunas(df)
-
-        if ano is not None:
-            df['ano_arquivo'] = int(ano)
+        df['ano_arquivo'] = ano  # adiciona a coluna com o ano
 
         dfs.append(df)
         print(f"Lido e padronizado: {arq.name} (linhas: {len(df)})")
-
-    return pd.concat(dfs, ignore_index=True)
+    
+    return pd.concat(dfs, ignore_index = True)
 
 df_final = ler_e_concatenar(pasta)
 
