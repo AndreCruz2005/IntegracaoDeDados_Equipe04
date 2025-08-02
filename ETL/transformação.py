@@ -35,6 +35,17 @@ for coluna in COL_NUMERIC:
     df[coluna] = pd.to_numeric(df[coluna],errors='coerce')
 
 
+# Pega o conjunto de todas as colunas
+todas_colunas = set(df.columns)
+
+# Subtrai as colunas numéricas e inteiras
+colunas_string = todas_colunas - set(COL_INT) - set(COL_NUMERIC)
+
+# Converte as colunas restantes para string
+for coluna in colunas_string:
+    df[coluna] = df[coluna].astype(str)
+
+
 
 #salvando meu tratamento em um novo arquivo csv
 df.to_csv("despesas_recife_tratadas.csv",index = False)
