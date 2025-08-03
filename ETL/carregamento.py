@@ -54,6 +54,7 @@ tipos_colunas_sqlalchemy = {
 }
 
 # Envia ao banco (os dados já estão tratados)
+print("vai começar a brincadeira")
 df.to_sql(
     name="despesas_recife",
     con=engine,
@@ -61,3 +62,5 @@ df.to_sql(
     index=False,
     dtype=tipos_colunas_sqlalchemy
 )
+
+print("a brincadeira terminou")

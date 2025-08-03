@@ -30,7 +30,18 @@ df.columns = (
 for coluna in COL_INT:
     df[coluna] = df[coluna].astype(int)
 
+#erro na transformação, a partir de 2016 'valor_empenhado', 'valor_liquidado', 'valor_pago' começaram a vir 
+# com , e não com . como nos anos anteriores
 for coluna in COL_NUMERIC:
+    # Para os anos a partir de 2016, troca vírgula por ponto antes de converter
+    mask_2016 = df['ano_movimentacao'] >= 2016
+    df.loc[mask_2016, coluna] = (
+        df.loc[mask_2016, coluna]
+        .astype(str)
+        .str.replace('.', '', regex=False)   # Remove separador de milhar, se existir
+        .str.replace(',', '.', regex=False)
+    )
+
     # aqui passo para numeric e errors='coerce' faz valores inválidos como abcde virarem NAN só para verificar
     df[coluna] = pd.to_numeric(df[coluna],errors='coerce')
 
@@ -48,4 +59,5 @@ for coluna in colunas_string:
 
 
 #salvando meu tratamento em um novo arquivo csv
-df.to_csv("despesas_recife_tratadas.csv",index = False)
+df.to_csv("despesas_recife_tratadas.csv",index = False) 
+
