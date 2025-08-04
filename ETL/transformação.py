@@ -1,12 +1,12 @@
 import pandas as pd
 
 #criação do meu dataframe
-df = pd.read_csv(r"C:\Users\joaov\OneDrive\Documentos\cin\repositorio\ProjetoIntegracao\IntegracaoDeDados_Equipe04\despesas_recife.csv")
+df = pd.read_csv("despesas_recife.csv", encoding='utf-8')
 
 
 #teste se esxistia alguma valor faltando em alguma coluna da tabela --- resultado 0 valores faltando nas colunas
 # assim não foi preciso tratar valores faltantes
-print(df.isnull().sum())
+#print(df.isnull().sum())
 
 
 COL_INT = ('empenho_ano', 'ano_movimentacao', 'mes_movimentacao', 'orgao_codigo',
@@ -59,5 +59,5 @@ for coluna in colunas_string:
 
 
 #salvando meu tratamento em um novo arquivo csv
-df.to_csv("despesas_recife_tratadas.csv",index = False) 
+df.to_csv("despesas_recife_tratadas.csv", index=False, encoding='utf-8')
 

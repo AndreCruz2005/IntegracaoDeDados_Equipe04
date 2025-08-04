@@ -12,7 +12,7 @@ arquivos_csv = sorted(pasta.glob("recife-dados-despesas-*.csv"))  # * é um wild
 lista_dfs = []
 
 for arq in arquivos_csv:
-    data_frame = pd.read_csv(arq, sep=';', encoding= 'latin1') # latin1 serve para ler os caracteres especiais da língua
+    data_frame = pd.read_csv(arq, sep=';', encoding= 'utf-8') # latin1 serve para ler os caracteres especiais da língua
     
     lista_dfs.append(data_frame)
 

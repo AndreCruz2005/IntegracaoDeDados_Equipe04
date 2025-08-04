@@ -3,7 +3,7 @@ from sqlalchemy.types import Integer, Numeric, String
 import pandas as pd
 
 # Carrega o CSV JÁ TRATADO
-df = pd.read_csv("despesas_recife_tratadas.csv")
+df = pd.read_csv("despesas_recife_tratadas.csv", encoding='utf-8')
 
 # Apenas mapeia tipos do Pandas para o PostgreSQL evitando que ele interprete sozinho e converta os valores que eu já havia transformado
 tipos_colunas_sqlalchemy = {
