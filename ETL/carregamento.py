@@ -1,4 +1,4 @@
-from Engine import engine  # Sua engine já configurada
+from postgres.engine import engine  
 from sqlalchemy.types import Integer, Numeric, String
 import pandas as pd
 

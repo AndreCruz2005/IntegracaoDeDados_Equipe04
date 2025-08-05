@@ -1,3 +1,8 @@
+# Resultado de operações sobre arquivos CSV
+despesas_recife.csv
+despesas_recife_tratadas.csv
+test_output.csv
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

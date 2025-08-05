@@ -34,16 +34,22 @@ Respositório para projeto de Integração de Dados - Banco de Dados CIn/UFPE 20
 
 ## Execução
 
-Para criar as entidades no banco de dados PostgreSQL
+1. Extrair dados dos arquivos CSV de data/ e armazena-los, não tratados, em despesas_recife.csv
 
 ```sh
-python ETL/postgres/criar_tabelas.py
+python ETL/extração.py
 ```
 
-Para extrair dados das tabelas CSV, transformar-los e fazer o upload destes para o banco de dados
+2. Transformar os dados de despesas_recife.csv e armazenar em despesas_recife_tratadas.csv
 
 ```sh
-python ETL/processar_data.py
+python ETL/transformação.py
+```
+
+3. Carregar os dados tratados no banco de dados PostgreSQL:
+
+```sh
+python ETL/carregamento.py
 ```
 
 ## Observações

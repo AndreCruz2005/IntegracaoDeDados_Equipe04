@@ -1,4 +1,4 @@
-from Engine import engine
+from postgres.engine import engine
 from sqlalchemy import text
 
 #unica diferença para a cpnsulta do menor valor é ASC que vai organizar do menor para o maior a soma dos valores pagos
