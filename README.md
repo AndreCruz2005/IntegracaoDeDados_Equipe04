@@ -48,4 +48,4 @@ python ETL/processar_data.py
 
 ## Observações
 
-- Certifique-se de que o banco de dados está acessível conforme configurado em `.env`.
+-   Certifique-se de que o banco de dados está acessível conforme configurado em `.env`.
