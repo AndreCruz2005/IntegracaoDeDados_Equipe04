@@ -17,7 +17,7 @@ print("Carregando dados sem transformação na tabela raw_despesas")
 
 for ano in anos:
     print(f"Processando ano {ano}...")
-    caminho = f"rawData/recife-dados-despesas-{ano}.csv"
+    caminho = f"../data/recife-dados-despesas-{ano}.csv"
     
     # Extração: lê os dados CSV sem nenhuma transformação
     # Mantém encoding latin1 para preservar caracteres especiais originais
