@@ -5,7 +5,7 @@ def create_view_valor_gasto_ano(conn):
         CREATE OR REPLACE VIEW vw_valor_gasto_ano AS
         SELECT
             ano_movimentacao,
-            total_valor_pago
+            ROUND(total_valor_pago, 2) AS total_valor_pago
         FROM (
             SELECT
                 ano_movimentacao,
