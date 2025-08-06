@@ -1,1 +1,2 @@
+# Armazena arquivos CSV grandes no Git LFS
 *.csv filter=lfs diff=lfs merge=lfs -text

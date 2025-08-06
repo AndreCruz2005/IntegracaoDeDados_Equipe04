@@ -1,12 +1,12 @@
 import pandas as pd
 
-#criação do meu dataframe
+# Carrega dataframe unificado
 df = pd.read_csv("despesas_recife.csv", encoding='utf-8')
 
 
-#teste se esxistia alguma valor faltando em alguma coluna da tabela --- resultado 0 valores faltando nas colunas
+# Teste se existia alguma valor faltando em alguma coluna da tabela --- resultado 0 valores faltando nas colunas
 # assim não foi preciso tratar valores faltantes
-#print(df.isnull().sum())
+# print(df.isnull().sum())
 
 
 COL_INT = ('empenho_ano', 'ano_movimentacao', 'mes_movimentacao', 'orgao_codigo',
@@ -15,14 +15,13 @@ COL_INT = ('empenho_ano', 'ano_movimentacao', 'mes_movimentacao', 'orgao_codigo'
             'acao_codigo','fonte_recurso_codigo','empenho_numero','subempenho', 'credor_codigo',
             'modalidade_licitacao_codigo')
 
-#optei por numeric no lugar de float para evitar problemas com arredondamento e conseguir mais precisão
+# Opta-se por numeric ao invés de float para evitar problemas com arredondamento e conseguir mais precisão
 COL_NUMERIC = ('valor_empenhado', 'valor_liquidado', 'valor_pago')
 
-
-#padronização das minhas colunas
+# Padronização das colunas
 df.columns = (
     df.columns
-    .str.strip()         # Remove espaços 
+    .str.strip()         # Remove espaços vazios no começo e fim 
     .str.lower()         # Deixa tudo minúsculo
     .str.replace(" ", "_")  # Substitui espaços por underline
 )
@@ -30,7 +29,7 @@ df.columns = (
 for coluna in COL_INT:
     df[coluna] = df[coluna].astype(int)
 
-#erro na transformação, a partir de 2016 'valor_empenhado', 'valor_liquidado', 'valor_pago' começaram a vir 
+# Erro na transformação, a partir de 2016 'valor_empenhado', 'valor_liquidado', 'valor_pago' começaram a vir 
 # com , e não com . como nos anos anteriores
 for coluna in COL_NUMERIC:
     # Para os anos a partir de 2016, troca vírgula por ponto antes de converter
@@ -42,7 +41,7 @@ for coluna in COL_NUMERIC:
         .str.replace(',', '.', regex=False)
     )
 
-    # aqui passo para numeric e errors='coerce' faz valores inválidos como abcde virarem NAN só para verificar
+    # Aqui converte para numeric e errors='coerce' faz valores inválidos virarem NAN por precaução
     df[coluna] = pd.to_numeric(df[coluna],errors='coerce')
 
 
@@ -57,7 +56,6 @@ for coluna in colunas_string:
     df[coluna] = df[coluna].astype(str)
 
 
-
-#salvando meu tratamento em um novo arquivo csv
+# Salvando tratamento em um novo arquivo csv
 df.to_csv("despesas_recife_tratadas.csv", index=False, encoding='utf-8')
 

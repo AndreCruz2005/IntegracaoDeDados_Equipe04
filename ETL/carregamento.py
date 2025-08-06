@@ -54,7 +54,7 @@ tipos_colunas_sqlalchemy = {
 }
 
 # Envia ao banco (os dados já estão tratados)
-print("vai começar a brincadeira")
+print("Carregamento de dados iniciado")
 df.to_sql(
     name="despesas_recife",
     con=engine,
@@ -63,4 +63,4 @@ df.to_sql(
     dtype=tipos_colunas_sqlalchemy
 )
 
-print("a brincadeira terminou")
+print("Carregamento de dados finalizado")

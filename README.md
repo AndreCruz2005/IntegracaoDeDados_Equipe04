@@ -5,7 +5,7 @@ Respositório para projeto de Integração de Dados - Banco de Dados CIn/UFPE 20
 ## Pré-requisitos
 
 -   Python 3.10 ou superior
--   PostgreSQL rodando localmente (ou ajuste a variável de ambiente `DATABASE_URL`)
+-   PostgreSQL rodando localmente (ou ajuste as variáveis de ambiente)
 -   Instalar dependências do projeto
 
 ## Instalação
@@ -32,7 +32,7 @@ Respositório para projeto de Integração de Dados - Banco de Dados CIn/UFPE 20
     pip install -r requirements.txt
     ```
 
-## Execução
+## Execução - ETL
 
 1. Extrair dados dos arquivos CSV de data/ e armazena-los, não tratados, em despesas_recife.csv
 
@@ -50,6 +50,11 @@ python ETL/transformação.py
 
 ```sh
 python ETL/carregamento.py
+```
+
+4. Criar views no banco de dados:
+```sh
+python ETL/criar_views.py
 ```
 
 ## Observações

@@ -1,10 +1,8 @@
-from postgres.engine import engine
 from sqlalchemy import text
 
-#unica diferença para a cpnsulta do menor valor é ASC que vai organizar do menor para o maior a soma dos valores pagos
-with engine.begin() as conn:  
+def create_view_maior_valorpago_ano(conn):
     conn.execute(text("""
-        CREATE OR REPLACE VIEW vw_menor_valorpago_ano AS
+        CREATE OR REPLACE VIEW vw_maior_valorpago_ano AS
         SELECT
             ano_movimentacao,
             orgao_nome,
@@ -16,7 +14,7 @@ with engine.begin() as conn:
                 SUM(valor_pago) AS total_valor_pago,
                 ROW_NUMBER() OVER (
                     PARTITION BY ano_movimentacao
-                    ORDER BY SUM(valor_pago) ASC     
+                    ORDER BY SUM(valor_pago) DESC
                 ) AS rn
             FROM
                 despesas_recife

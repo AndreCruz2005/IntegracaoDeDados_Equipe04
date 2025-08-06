@@ -3,21 +3,21 @@ from pathlib import Path
 
 pasta = Path(r"data")
 
-#.glob um objeto pathlib e ele vai procurar os arquivos dentro da minha pasta 
-arquivos_csv = sorted(pasta.glob("recife-dados-despesas-*.csv"))  # * é um wildcard pega tudo entre o nome e o csv
+# Usa glob() do objeto Path de pathlib para conseguir o path para todos os arquivos CSV entre 2003 e 2020
+arquivos_csv = sorted(
+    [arq for arq in pasta.glob("recife-dados-despesas-*.csv") 
+     if "2003" <= arq.stem.split('-')[-1] <= "2020"]
+) 
 
 lista_dfs = []
 
+# Tabelas são carregads como dataframes e armazenadas na lista
 for arq in arquivos_csv:
-    data_frame = pd.read_csv(arq, sep=';', encoding= 'utf-8') # latin1 serve para ler os caracteres especiais da língua
-    
+    data_frame = pd.read_csv(arq, sep=';', encoding='utf-8') 
     lista_dfs.append(data_frame)
 
-#junção das atabelas que estão na minha lista
+# Concatenação das tabelas na lista
 df_final = pd.concat(lista_dfs) 
 
-#salvando meu data frame na minha pasta para realizar a transformação depois
+# Salva dataframe unificado para transformação
 df_final.to_csv("despesas_recife.csv",index=False)
-
-
-
