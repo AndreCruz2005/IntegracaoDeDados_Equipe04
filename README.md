@@ -1,6 +1,7 @@
 # IntegracaoDeDados_Equipe04
-
 Respositório para projeto de Integração de Dados - Banco de Dados CIn/UFPE 2025.1
+
+[Relatório](https://docs.google.com/document/d/1zMhva70TFBJPyKV837nD3t88R8gd6yxZUf2RFE0995Q/edit?usp=sharing)
 
 ## Pré-requisitos
 
