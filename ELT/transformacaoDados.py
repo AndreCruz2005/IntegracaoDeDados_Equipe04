@@ -1,104 +1,107 @@
-import pandas as pd
-from sqlalchemy import create_engine, text
 import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
-# Configuração da conexão com banco PostgreSQL
-# Abordagem ELT: agora vamos transformar os dados que já estão no banco
-engine = create_engine(f"postgresql+psycopg2://{os.getenv('DATABASE_USER')}:{os.getenv('DATABASE_PASSWORD')}@{os.getenv('DATABASE_HOST')}/{os.getenv('DATABASE_URL')}")
+import sys
+from sqlalchemy import text
+parent_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(parent_folder)
+from postgres.engine import engine
 
 print("=== INICIANDO TRANSFORMAÇÃO ELT ===")
-print("Transformando dados da tabela raw_despesas")
+print("Transformando dados das tabelas 'raw_despesas_pre_2016' e 'raw_despesas_pos_2016'")
 
-# Extract: busca os dados brutos que foram carregados anteriormente
-print("Extraindo dados brutos da tabela raw_despesas...")
-df = pd.read_sql("SELECT * FROM raw_despesas", con=engine)
-print(f"  ✓ {len(df)} registros extraídos")
-
-# Transform: aplicação das transformações nos dados
-print("\nAplicando transformações...")
-
-# Colunas que devem ser convertidas para inteiro
-COL_INT = ('empenho_ano', 'ano_movimentacao', 'mes_movimentacao', 'orgao_codigo',
-           'grupo_despesa_codigo', 'modalidade_aplicacao_codigo', 'elemento_codigo',
-           'subelemento_codigo', 'funcao_codigo', 'subfuncao_codigo', 'programa_codigo',
-           'acao_codigo', 'fonte_recurso_codigo', 'empenho_numero', 'subempenho', 
-           'credor_codigo', 'modalidade_licitacao_codigo', 'ano')
-
-# Colunas que devem ser convertidas para decimal/numeric 
-COL_NUMERIC = ('valor_empenhado', 'valor_liquidado', 'valor_pago')
-
-# Padronização dos nomes das colunas seguindo padrão snake_case
-print("  → Padronizando nomes das colunas...")
-df.columns = (
-    df.columns
-    .str.strip()         # Remove espaços em branco
-    .str.lower()         # Converte para minúsculas 
-    .str.replace(" ", "_")  # Substitui espaços por underline
-)
-
-# Conversão de tipos de dados para inteiros
-print("  → Convertendo colunas numéricas inteiras...")
-for coluna in COL_INT:
-    if coluna in df.columns:
-        df[coluna] = pd.to_numeric(df[coluna], errors='coerce').astype('Int64')
-
-# Tratamento especial para valores monetários
-# erro na transformação, a partir de 2016 os valores vêm com vírgula em vez de ponto
-print("  → Tratando valores monetários (vírgula/ponto)...")
-for coluna in COL_NUMERIC:
-    if coluna in df.columns:
-        # Para anos >= 2016, substitui vírgula por ponto antes da conversão
-        mask_2016 = df['ano_movimentacao'] >= 2016
-        df.loc[mask_2016, coluna] = (
-            df.loc[mask_2016, coluna]
-            .astype(str)
-            .str.replace('.', '', regex=False)   # Remove separador de milhar, se existir
-            .str.replace(',', '.', regex=False)  # Substitui vírgula por ponto
-        )
+def clean_text(conn, table):
+    # Encontra todas as colunas que são texto
+        result = conn.execute(text(f"""
+        SELECT column_name 
+        FROM information_schema.columns
+        WHERE table_name = '{table}'
+        AND data_type = 'text';
+        """))
         
-        # aqui passo para numeric e errors='coerce' faz valores inválidos virarem NAN
-        df[coluna] = pd.to_numeric(df[coluna], errors='coerce')
+        columns = [row.column_name for row in result]
+        
+        # Trim espaços brancos, deixa tudo minúsculo, substitui ' ' por '_'
+        for column in columns:
+            print(f"Transformação iniciada para {table}.{column}")
+            conn.execute(text(f"""
+                UPDATE {table}
+                SET {column} = REPLACE(LOWER(TRIM({column})), ' ', '_')
+                WHERE {column} IS NOT NULL;
+            """))
+            print(f"Transformação de {table}.{column} finalizada")
+            
+def valores_monetarios_para_numeric(conn):
+    COL_NUMERIC = ('valor_empenhado', 'valor_liquidado', 'valor_pago')
+    
+    for column in COL_NUMERIC:
+        print(f"Transformação iniciada para 'raw_despesas_pos_2016'.{column}")
+        
+        # Primeiro, limpa os dados removendo caracteres não numéricos (exceto ponto e vírgula)
+        # e padroniza o separador decimal para ponto
+        conn.execute(text(f"""
+            UPDATE raw_despesas_pos_2016
+            SET {column} = CASE
+                WHEN {column} IS NULL OR TRIM(CAST({column} AS TEXT)) = '' THEN NULL
+                ELSE CAST(
+                    REPLACE(
+                        REPLACE(
+                            REGEXP_REPLACE(CAST({column} AS TEXT), '[^0-9,.\\-]', '', 'g'),
+                            ',', '.'
+                        ),
+                        '..', '.'
+                    ) AS NUMERIC(18,2)
+                )
+            END;
+        """))
+                    
+        # Depois altera o tipo da coluna para NUMERIC(18,2)
+        for table in ('raw_despesas_pre_2016', 'raw_despesas_pos_2016'):
+            conn.execute(text(f"""
+                ALTER TABLE {table}
+                ALTER COLUMN {column} TYPE NUMERIC(18,2)
+                USING {column}::NUMERIC(18,2);
+            """))
+        
+            print(f"Transformação de {table}.{column} finalizada")
+        
+def unificar_tabelas_despesas(conn):
+    # Cria a tabela unificada com base na estrutura de uma das tabelas
+    print("Criando tabela unificada 'despesas_recife'...")
+    conn.execute(text("""
+        CREATE TABLE IF NOT EXISTS despesas_recife AS
+        SELECT * FROM raw_despesas_pre_2016 WHERE 1=0;
+    """))
+    
+    # Insere dados da primeira tabela
+    print("Inserindo dados de 'raw_despesas_pre_2016'...")
+    conn.execute(text("""
+        INSERT INTO despesas_recife
+        SELECT * FROM raw_despesas_pre_2016;
+    """))
+    
+    # Insere dados da segunda tabela
+    print("Inserindo dados de 'raw_despesas_pos_2016'...")
+    conn.execute(text("""
+        INSERT INTO despesas_recife
+        SELECT * FROM raw_despesas_pos_2016;
+    """))
 
-# Conversão das colunas restantes para string
-print("  → Convertendo colunas restantes para string...")
-todas_colunas = set(df.columns)
-colunas_string = todas_colunas - set(COL_INT) - set(COL_NUMERIC)
-for coluna in colunas_string:
-    df[coluna] = df[coluna].astype(str)
+def tratar_unidade_codigo(conn, table):
+    conn.execute(text(f"""
+            ALTER TABLE {table}
+            ALTER COLUMN unidade_codigo TYPE text
+            USING unidade_codigo::text;
+    """))
 
-# Verificação de dados faltantes
-print("  → Verificando dados faltantes...")
-missing_data = df.isnull().sum()
-if missing_data.sum() > 0:
-    print(f"    ⚠ Encontrados {missing_data.sum()} valores faltantes")
-    print("    Valores faltantes por coluna:")
-    for col, count in missing_data[missing_data > 0].items():
-        print(f"      {col}: {count}")
-else:
-    print("    ✓ Nenhum valor faltante encontrado")
+with engine.begin() as conn:
 
-# Load: salva os dados transformados em nova tabela
-print("\nCarregando dados transformados...")
-with engine.connect() as connection:
-    # Remove tabela transformada se existir
-    connection.execute(text("DROP TABLE IF EXISTS despesas_transformadas"))
-    connection.commit()
-
-# Carrega dados transformados na nova tabela
-df.to_sql("despesas_transformadas", con=engine, if_exists="replace", index=False)
-
-print(f"  ✓ {len(df)} registros transformados carregados na tabela 'despesas_transformadas'")
-
-# Estatísticas finais
-print("\n=== ESTATÍSTICAS DA TRANSFORMAÇÃO ===")
-print(f"Total de registros processados: {len(df):,}")
-print(f"Anos processados: {sorted(df['ano_movimentacao'].unique())}")
-print(f"Período: {df['ano_movimentacao'].min()} a {df['ano_movimentacao'].max()}")
-print(f"Total de órgãos: {df['orgao_codigo'].nunique()}")
-print(f"Valor total empenhado: R$ {df['valor_empenhado'].sum():,.2f}")
-
+    for table in ('raw_despesas_pre_2016', 'raw_despesas_pos_2016'):
+        clean_text(conn, table)
+        tratar_unidade_codigo(conn, table)
+        pass
+    
+    valores_monetarios_para_numeric(conn)
+    unificar_tabelas_despesas(conn)
+    
+        
 print("\n=== TRANSFORMAÇÃO ELT CONCLUÍDA ===")
-print("Dados transformados disponíveis na tabela 'despesas_transformadas'")
+print("Dados transformados disponíveis na tabela 'despesas_recife'")

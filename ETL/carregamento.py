@@ -64,7 +64,7 @@ print("Carregamento de dados iniciado")
 df.to_sql(
     name="despesas_recife",
     con=engine,
-    if_exists="replace",
+    if_exists="append",
     index=False,
     dtype=tipos_colunas_sqlalchemy
 )

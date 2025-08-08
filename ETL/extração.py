@@ -3,10 +3,10 @@ from pathlib import Path
 
 pasta = Path(r"data")
 
-# Usa glob() do objeto Path de pathlib para conseguir o path para todos os arquivos CSV entre 2003 e 2020
+# Usa glob() do objeto Path de pathlib para conseguir o path para todos os arquivos CSV entre 2006 e 2017
 arquivos_csv = sorted(
     [arq for arq in pasta.glob("recife-dados-despesas-*.csv") 
-     if "2003" <= arq.stem.split('-')[-1] <= "2020"]
+     if "2006" <= arq.stem.split('-')[-1] <= "2017"]
 ) 
 
 lista_dfs = []

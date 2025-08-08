@@ -34,7 +34,7 @@ Respositório para projeto de Integração de Dados - Banco de Dados CIn/UFPE 20
 
 ## Execução - ETL
 
-### ETL
+### ETL (2006-2017)
 
 1. Extrair dados dos arquivos CSV de data/ e armazena-los, não tratados, em despesas_recife.csv
 
@@ -54,18 +54,12 @@ python ETL/transformação.py
 python ETL/carregamento.py
 ```
 
-4. Criar views no banco de dados:
-
-```sh
-python ETL/criar_views.py
-```
-
-### ELT
+### ELT (2002-2005, 2018-2020)
 
 1. Carregar dados brutos diretamente no PostgreSQL:
 
 ```sh
-python ELT/cargaRaw2008-2012.py
+python ELT/cargaRaw.py
 ```
 
 2. Transformar dados no banco de dados:
@@ -78,6 +72,14 @@ python ELT/transformacaoDados.py
 
 ```sh
 python ELT/testar_transformacao.py
+```
+
+### Após criação da tabela despesas_recife:
+
+1. Criar views no banco de dados:
+
+```sh
+python postgres/criar_views.py
 ```
 
 ## Observações
