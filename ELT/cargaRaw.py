@@ -1,7 +1,6 @@
 import os
 import sys
 import pandas as pd
-from sqlalchemy.types import String
 
 parent_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(parent_folder)
