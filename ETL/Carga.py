@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 df = pd.read_csv('df_transformado.csv')
 
 usuario = 'postgres'
-senha = 'Dovahkiin35$'
+senha = 'TiagoPressao123'
 host = 'localhost'
 porta = '5432'
 banco = 'integracao_dados'

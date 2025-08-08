@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: despesas_raw
+    database: despesas_recife
+    schema: public
+    tables:
+      - name: despesas
+
+# Configuração em yml para conectar com o banco de dados
