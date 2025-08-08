@@ -68,15 +68,15 @@ python ELT/cargaRaw.py
 python ELT/transformacaoDados.py
 ```
 
-3. Validar transformações:
-
-```sh
-python ELT/testar_transformacao.py
-```
-
 ### Após criação da tabela despesas_recife:
 
-1. Criar views no banco de dados:
+1. Validar transformações:
+
+```sh
+python tests/testar_transformacao.py
+```
+
+2. Criar views no banco de dados:
 
 ```sh
 python postgres/criar_views.py
