@@ -6,3 +6,11 @@ from views.view_gasto_medio_mes import *
 from views.view_credores_mais_receberam import *
 from views.view_ranking_programas import *
 from views.view_programa_prefeito import *
+from .view_total_pago_yoy import *
+from .view_yoy_por_orgao import *
+from .view_share_programa_ano import *
+from .view_hhi_credores_ano import *
+from .view_gap_empenho_pagamento import *
+from .view_ticket_medio_orgao_ano import *
+from .view_total_mes_rolling import *
+from .view_top10_credores_ano import *
