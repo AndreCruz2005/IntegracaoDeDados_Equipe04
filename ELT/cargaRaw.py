@@ -7,7 +7,7 @@ sys.path.append(parent_folder)
 from postgres.engine import engine
 
 # Lista dos anos que serão processados na abordagem ELT
-anos = tuple(range(2003, 2020))
+anos = (2003, 2004, 2005, 2018, 2019, 2020)
 
 print("=== INICIANDO CARGA ELT - DADOS BRUTOS ===")
 print("Carregando dados sem transformação na tabela raw_despesas")
