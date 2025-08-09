@@ -19,12 +19,9 @@ COL_INT = ('empenho_ano', 'ano_movimentacao', 'mes_movimentacao', 'orgao_codigo'
 COL_NUMERIC = ('valor_empenhado', 'valor_liquidado', 'valor_pago')
 
 # Padronização das colunas
-df.columns = (
-    df.columns
-    .str.strip()         # Remove espaços vazios no começo e fim 
-    .str.lower()         # Deixa tudo minúsculo
-    .str.replace(" ", "_")  # Substitui espaços por underline
-)
+df.columns = df.columns.str.strip()         # Remove espaços vazios no começo e fim 
+df.columns = df.columns.str.lower()         # Deixa tudo minúsculo
+df.columns = df.columns.str.replace(" ", "_")  # Substitui espaços por underline
 
 for coluna in COL_INT:
     df[coluna] = df[coluna].astype(int)
@@ -53,7 +50,13 @@ colunas_string = todas_colunas - set(COL_INT) - set(COL_NUMERIC)
 
 # Converte as colunas restantes para string
 for coluna in colunas_string:
-    df[coluna] = df[coluna].astype(str)
+    df[coluna] = (
+        df[coluna]
+        .astype(str)                # Garante tipo string
+        .str.strip()                 # Remove espaços no início e no fim
+        .str.lower()                 # Converte para minúsculas
+        .str.replace(r"\s+", "_", regex=True)  # Substitui múltiplos espaços por um underline
+    )
 
 
 # Salvando tratamento em um novo arquivo csv
